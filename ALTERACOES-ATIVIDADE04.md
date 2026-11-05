@@ -1,47 +1,47 @@
-# Alterações da Atividade 04 – suporte a escape de placeholders
+﻿# AlteraÃ§Ãµes da Atividade 04 â€“ suporte a escape de placeholders
 
 Fork de trabalho de [tldr-pages/tldr-node-client](https://github.com/tldr-pages/tldr-node-client)
-(licença MIT, versão base 3.5.0, commit `02a5ce2`). Esta alteração **não foi enviada ao projeto
-original** (ver seção 1.1 do enunciado).
+(licenÃ§a MIT, versÃ£o base 3.5.0, commit `02a5ce2`). Esta alteraÃ§Ã£o **nÃ£o foi enviada ao projeto
+original** (ver seÃ§Ã£o 1.1 do enunciado).
 
-Issue de referência: [#432 – Client specification v2.1 compliance: add placeholder escaping support](https://github.com/tldr-pages/tldr-node-client/issues/432).
+Issue de referÃªncia: [#432 â€“ Client specification v2.1 compliance: add placeholder escaping support](https://github.com/tldr-pages/tldr-node-client/issues/432).
 
 ## O que foi adicionado
 
-Nas páginas tldr, `{{valor}}` marca um trecho que o usuário deve substituir. Algumas páginas
+Nas pÃ¡ginas tldr, `{{valor}}` marca um trecho que o usuÃ¡rio deve substituir. Algumas pÃ¡ginas
 (por exemplo `docker inspect`) precisam mostrar `{{ ... }}` de verdade, e a
-[especificação de clientes v2.1](https://github.com/tldr-pages/tldr/blob/main/CLIENT-SPECIFICATION.md#page-structure)
-define que isso é escrito como `\{\{ ... \}\}`.
+[especificaÃ§Ã£o de clientes v2.1](https://github.com/tldr-pages/tldr/blob/main/CLIENT-SPECIFICATION.md#page-structure)
+define que isso Ã© escrito como `\{\{ ... \}\}`.
 
-Antes, o cliente mostrava as barras e chaves como estavam (`\{\{.Name\}\}`). Agora segue a especificação:
+Antes, o cliente mostrava as barras e chaves como estavam (`\{\{.Name\}\}`). Agora segue a especificaÃ§Ã£o:
 
-| Texto na página | Antes | Agora |
+| Texto na pÃ¡gina | Antes | Agora |
 | --- | --- | --- |
 | `{{container}}` | `container` (destacado) | igual |
 | `\{\{.Name\}\}` | `\{\{.Name\}\}` | `{{.Name}}` (literal, sem destaque) |
 | `\}\}` sozinho | `\}\}` | `}}` |
-| `\{` ou `\}` (uma chave só) | igual | igual (a barra é mantida) |
-| `\{{x}}` (só a primeira chave escapada) | `\x` com `x` destacado | igual (não é escape: a barra é mantida) |
+| `\{` ou `\}` (uma chave sÃ³) | igual | igual (a barra Ã© mantida) |
+| `\{{x}}` (sÃ³ a primeira chave escapada) | `\x` com `x` destacado | igual (nÃ£o Ã© escape: a barra Ã© mantida) |
 | `{{a\}\}b}}` | `a\}\}b` destacado | `a}}b` destacado |
 
-A regra da especificação: o escape só vale quando **as duas chaves** estão escapadas.
+A regra da especificaÃ§Ã£o: o escape sÃ³ vale quando **as duas chaves** estÃ£o escapadas.
 
 ### Arquivos alterados
 
-- `lib/render.js`: nova função `unescapeBraces`, aplicada a cada trecho dentro de `highlight`
-  (+9 linhas). Um par escapado (`\{\{`) nunca contém duas chaves seguidas, então não interfere na
-  divisão por `{{ ... }}` que já existia.
+- `lib/render.js`: nova funÃ§Ã£o `unescapeBraces`, aplicada a cada trecho dentro de `highlight`
+  (+9 linhas). Um par escapado (`\{\{`) nunca contÃ©m duas chaves seguidas, entÃ£o nÃ£o interfere na
+  divisÃ£o por `{{ ... }}` que jÃ¡ existia.
 - `test/render.spec.js`: 8 testes novos, em `describe('placeholder escaping ...')`.
 
-O parser (`lib/parser.js`) não precisou de mudança: o `marked` não aplica escapes dentro de
-code spans, então as barras chegam intactas ao renderizador.
+O parser (`lib/parser.js`) nÃ£o precisou de mudanÃ§a: o `marked` nÃ£o aplica escapes dentro de
+code spans, entÃ£o as barras chegam intactas ao renderizador.
 
 ## Como fazer o build
 
-Não há etapa de build (é JavaScript puro, sem transpilação). Requisito: Node.js 22 ou superior.
+NÃ£o hÃ¡ etapa de build (Ã© JavaScript puro, sem transpilaÃ§Ã£o). Requisito: Node.js 22 ou superior.
 
 ```bash
-git clone <URL-do-fork>
+git clone https://github.com/GSetteF/tldr-node-client.git
 cd tldr-node-client
 git checkout feat/placeholder-escaping
 npm ci
@@ -50,13 +50,13 @@ npm ci
 ## Como testar
 
 ```bash
-npm test             # testes unitários: 103 (95 originais + 8 novos)
+npm test             # testes unitÃ¡rios: 103 (95 originais + 8 novos)
 npm run lint         # eslint
 npm run typecheck    # tsc --noEmit
 ```
 
-`npm run test:all` também roda o teste funcional (`test/functional-test.sh`), que baixa as
-páginas do tldr pela internet; ele precisa de acesso à rede.
+`npm run test:all` tambÃ©m roda o teste funcional (`test/functional-test.sh`), que baixa as
+pÃ¡ginas do tldr pela internet; ele precisa de acesso Ã  rede.
 
 ### Teste manual (sem rede)
 
@@ -79,10 +79,10 @@ node bin/tldr --render docker-inspect.md
 ```
 
 Resultado esperado: `docker inspect --format '{{.Name}}' container`, com apenas `container`
-destacado (sublinhado/itálico no tema padrão).
+destacado (sublinhado/itÃ¡lico no tema padrÃ£o).
 
-## Limitações conhecidas
+## LimitaÃ§Ãµes conhecidas
 
-- O teste funcional (`test:all`) não foi executado no ambiente de desenvolvimento, por falta
-  de acesso à rede; lint, tipos e testes unitários passaram.
-- Só o texto dos exemplos é afetado. Descrições e a saída `--markdown` não foram alteradas.
+- O teste funcional (`test:all`) nÃ£o foi executado no ambiente de desenvolvimento, por falta
+  de acesso Ã  rede; lint, tipos e testes unitÃ¡rios passaram.
+- SÃ³ o texto dos exemplos Ã© afetado. DescriÃ§Ãµes e a saÃ­da `--markdown` nÃ£o foram alteradas.
